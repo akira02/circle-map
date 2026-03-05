@@ -57,12 +57,12 @@ import { MapViewer } from '@circlemap/react-viewer';
   prefix: "A",                          // 攤位前綴，如 A01, A02...
   position: { x: 10800, y: 4400 },      // 左上角座標
   size: { width: 240, height: 2640 },   // 整排總尺寸
-  orientation: "vertical",              // 排列方向
   layoutConfig: {
-    columns: 2,                         // 幾列（1 = 單排, 2 = 背對背雙排）
+    columns: 2,                         // 幾排，沿短邊切分
     startNumber: 1,
     endNumber: 44,
-    numberingDirection: "bottom_to_top_then_top_to_bottom"
+    numberingDirection: "serpentine",   // 或 "same_direction"
+    startCorner: "bottom_left"          // top_left | top_right | bottom_left | bottom_right
   },
   skips: [22, 23]                       // 跳過的編號（通道空位）
 }

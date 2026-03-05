@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import type { BoothBlock, Facility, SpecialZone, Obstacle, NumberingDirection } from '@circlemap/core';
+import type { BoothBlock, Facility, SpecialZone, Obstacle, NumberingDirection, StartCorner } from '@circlemap/core';
 import { useEditorStore } from '../store';
 
 type AddMode = 'boothBlock' | 'facility' | 'specialZone' | 'obstacle' | null;
@@ -131,12 +131,6 @@ function BoothBlockPanel({ block }: { block: BoothBlock }) {
         <Field label="寬 W"><NumInput value={block.size.width} min={1} onChange={(v) => p({ size: { ...block.size, width: v } })} /></Field>
         <Field label="高 H"><NumInput value={block.size.height} min={1} onChange={(v) => p({ size: { ...block.size, height: v } })} /></Field>
       </div>
-      <Field label="方向 Orientation">
-        <select style={inp} value={block.orientation} onChange={(e) => p({ orientation: e.target.value as any })}>
-          <option value="vertical">vertical</option>
-          <option value="horizontal">horizontal</option>
-        </select>
-      </Field>
       <div style={row2}>
         <Field label="排數 Columns">
           <NumInput value={lc.columns} min={1} onChange={(v) => p({ layoutConfig: { ...lc, columns: v } })} />
@@ -163,14 +157,16 @@ function BoothBlockPanel({ block }: { block: BoothBlock }) {
       </div>
       <Field label="編號方向">
         <select style={inp} value={lc.numberingDirection} onChange={(e) => p({ layoutConfig: { ...lc, numberingDirection: e.target.value as NumberingDirection } })}>
-          <option value="bottom_to_top_then_top_to_bottom">bottom→top then top→bottom</option>
-          <option value="top_to_bottom_then_bottom_to_top">top→bottom then bottom→top</option>
-          <option value="left_to_right_then_right_to_left">left→right then right→left</option>
-          <option value="right_to_left_then_left_to_right">right→left then left→right</option>
-          <option value="left_to_right">left→right</option>
-          <option value="right_to_left">right→left</option>
-          <option value="top_to_bottom">top→bottom</option>
-          <option value="bottom_to_top">bottom→top</option>
+          <option value="serpentine">serpentine</option>
+          <option value="same_direction">same_direction</option>
+        </select>
+      </Field>
+      <Field label="起始角落">
+        <select style={inp} value={lc.startCorner} onChange={(e) => p({ layoutConfig: { ...lc, startCorner: e.target.value as StartCorner } })}>
+          <option value="top_left">top_left</option>
+          <option value="top_right">top_right</option>
+          <option value="bottom_left">bottom_left</option>
+          <option value="bottom_right">bottom_right</option>
         </select>
       </Field>
     </div>
@@ -272,9 +268,9 @@ export const Sidebar: React.FC = () => {
   // ── Add-element form state ──
   const [bb, setBb] = useState({
     prefix: 'X', x: '0', y: '0', width: '240', height: '2400',
-    orientation: 'vertical' as 'horizontal' | 'vertical',
     columns: '2', startNumber: '1', endNumber: '44',
-    numberingDirection: 'bottom_to_top_then_top_to_bottom' as NumberingDirection,
+    numberingDirection: 'serpentine' as NumberingDirection,
+    startCorner: 'bottom_left' as StartCorner,
     skips: '',
   });
   const [fac, setFac] = useState({ type: 'ENTRANCE' as Facility['type'], label: '入口', x: '0', y: '0', width: '400', height: '200' });
@@ -304,8 +300,13 @@ export const Sidebar: React.FC = () => {
       prefix: bb.prefix,
       position: { x: Number(bb.x), y: Number(bb.y) },
       size: { width: Number(bb.width), height: Number(bb.height) },
-      orientation: bb.orientation,
-      layoutConfig: { columns: Number(bb.columns), startNumber: Number(bb.startNumber), endNumber: Number(bb.endNumber), numberingDirection: bb.numberingDirection },
+      layoutConfig: {
+        columns: Number(bb.columns),
+        startNumber: Number(bb.startNumber),
+        endNumber: Number(bb.endNumber),
+        numberingDirection: bb.numberingDirection,
+        startCorner: bb.startCorner,
+      },
       ...(skipsArr.length > 0 ? { skips: skipsArr } : {}),
     };
     addBoothBlock(block);
@@ -382,7 +383,6 @@ export const Sidebar: React.FC = () => {
               <Field label="寬 W"><input style={inp} type="number" value={bb.width} onChange={e => setBb({ ...bb, width: e.target.value })} /></Field>
               <Field label="高 H"><input style={inp} type="number" value={bb.height} onChange={e => setBb({ ...bb, height: e.target.value })} /></Field>
             </div>
-            <Field label="方向"><select style={inp} value={bb.orientation} onChange={e => setBb({ ...bb, orientation: e.target.value as any })}><option value="vertical">vertical</option><option value="horizontal">horizontal</option></select></Field>
             <div style={row2}>
               <Field label="排數"><input style={inp} type="number" value={bb.columns} onChange={e => setBb({ ...bb, columns: e.target.value })} /></Field>
               <Field label="起始編號"><input style={inp} type="number" value={bb.startNumber} onChange={e => setBb({ ...bb, startNumber: e.target.value })} /></Field>
@@ -393,14 +393,16 @@ export const Sidebar: React.FC = () => {
             </div>
             <Field label="編號方向">
               <select style={inp} value={bb.numberingDirection} onChange={e => setBb({ ...bb, numberingDirection: e.target.value as NumberingDirection })}>
-                <option value="bottom_to_top_then_top_to_bottom">bottom→top then top→bottom</option>
-                <option value="top_to_bottom_then_bottom_to_top">top→bottom then bottom→top</option>
-                <option value="left_to_right_then_right_to_left">left→right then right→left</option>
-                <option value="right_to_left_then_left_to_right">right→left then left→right</option>
-                <option value="left_to_right">left→right</option>
-                <option value="right_to_left">right→left</option>
-                <option value="top_to_bottom">top→bottom</option>
-                <option value="bottom_to_top">bottom→top</option>
+                <option value="serpentine">serpentine</option>
+                <option value="same_direction">same_direction</option>
+              </select>
+            </Field>
+            <Field label="起始角落">
+              <select style={inp} value={bb.startCorner} onChange={e => setBb({ ...bb, startCorner: e.target.value as StartCorner })}>
+                <option value="top_left">top_left</option>
+                <option value="top_right">top_right</option>
+                <option value="bottom_left">bottom_left</option>
+                <option value="bottom_right">bottom_right</option>
               </select>
             </Field>
             <div style={{ display: 'flex', gap: '0.5rem' }}>

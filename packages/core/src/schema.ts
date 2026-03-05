@@ -34,23 +34,16 @@ export interface Facility {
   direction?: Direction; // Arrow direction for entrances/exits
 }
 
-export type Orientation = 'horizontal' | 'vertical';
+export type NumberingDirection = 'serpentine' | 'same_direction';
 
-export type NumberingDirection =
-  | 'bottom_to_top_then_top_to_bottom'
-  | 'top_to_bottom_then_bottom_to_top'
-  | 'left_to_right_then_right_to_left'
-  | 'right_to_left_then_left_to_right'
-  | 'left_to_right'
-  | 'right_to_left'
-  | 'top_to_bottom'
-  | 'bottom_to_top';
+export type StartCorner = 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right';
 
 export interface LayoutConfig {
   columns: number; // Single row is 1, double row back-to-back is 2
   startNumber: number;
   endNumber: number;
   numberingDirection: NumberingDirection;
+  startCorner: StartCorner;
 }
 
 export interface BoothBlock {
@@ -59,7 +52,6 @@ export interface BoothBlock {
   prefix: string;       // e.g., "A"
   position: Point;      // Block starting top-left bound position
   size: Size;           // Total physical bounding box size
-  orientation: Orientation;
   layoutConfig: LayoutConfig;
   skips?: number[];     // Actual logical numbering to skip
 }

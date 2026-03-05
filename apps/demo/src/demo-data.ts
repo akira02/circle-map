@@ -31,12 +31,12 @@ export const demoData: MapData = {
       prefix: "A",
       position: { x: 1500, y: 1000 },
       size: { width: 300, height: 3600 },
-      orientation: "vertical",
       layoutConfig: {
         columns: 2,
         startNumber: 1,
         endNumber: 48,
-        numberingDirection: "top_to_bottom_then_bottom_to_top"
+        numberingDirection: "serpentine",
+        startCorner: "top_left"
       },
       skips: [24, 25] 
     }
